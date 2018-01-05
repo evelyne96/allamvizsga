@@ -1,0 +1,16 @@
+MANIFEST.in
+README.rst
+setup.py
+bot/__init__.py
+bot/admin.py
+bot/apps.py
+bot/models.py
+bot/tests.py
+bot/urls.py
+bot/views.py
+bot/migrations/__init__.py
+bot/templates/index.html
+django_bot.egg-info/PKG-INFO
+django_bot.egg-info/SOURCES.txt
+django_bot.egg-info/dependency_links.txt
+django_bot.egg-info/top_level.txt
