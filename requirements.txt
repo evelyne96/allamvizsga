@@ -12,3 +12,4 @@ six==1.11.0
 virtualenv==15.1.0
 wrapt==1.10.11
 gunicorn==19.6.0
+whitenoise==3.3.0
