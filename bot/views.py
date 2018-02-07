@@ -17,7 +17,7 @@ def index(request):
     file = open(filename, "r")
     last_one = "Joke"
     for line in file:
-        messages.append(model.Message(line, datetime.datetime.now()))
+        #messages.append(model.Message(line, datetime.datetime.now()))
         last_one = line
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", last_one))
     file.close()
@@ -29,6 +29,10 @@ def index(request):
     context = {
         'title': "Chatbot.",
         'messages': messages,
+        'background' : "images/wallpaper/happy/2.jpg",
+        'character' : "images/female/Koko/talk2.png",
+        'gamer' : "images/male/Gamers/5.png",
+        'characterName' : "Koko"
     }
     return render(request, 'index.html', context)
 
