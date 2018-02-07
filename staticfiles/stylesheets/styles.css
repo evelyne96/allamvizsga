@@ -1,0 +1,122 @@
+
+#bg{
+    background-size: cover;
+    margin: 0%;
+    padding: 0%;
+    color: black;
+    z-index: -1;
+}
+
+#character{
+    width: 40%;
+    height: 100%;
+    margin-left: 60%;
+    margin-bottom: 0%;
+    bottom:0px;
+    position: fixed;
+}
+
+#gamer{
+    width: 20%;
+    height: 100%;
+}
+
+div.leftcenter {
+    width: 50%;
+    top: 20%;
+    right: 40%;
+    left: 15%;
+}
+
+div.box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 70%;
+    margin: 5%;
+    margin-left: 10%;
+}
+
+div.speach-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    height: 25%;
+}
+
+
+.speech-bubble {
+    position: relative;
+    height: 100%;
+    width: 75%;
+	background-color: rgba(54, 50, 50, 0.781);
+	border-radius: .4em;
+}
+
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+    border: 22px solid transparent;
+	border-right-color: rgba(54, 50, 50, 0.781);
+	border-left: 0;
+	border-bottom: 0;
+	margin-top: -11px;
+	margin-left: -22px;
+}
+
+.character-speach-bubble{
+    position: relative;
+    height: 60%;
+	background-color: rgba(54, 50, 50, 0.781);
+	border-radius: .4em;
+}
+
+.character-speach-bubble:after {
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 22px solid transparent;
+	border-left-color: rgba(54, 50, 50, 0.781);
+	border-right: 0;
+	border-bottom: 0;
+	margin-top: -9.5px;
+	margin-right: -22px;
+}
+
+#bubbleText {
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    border: 0px solid transparent;
+    font-weight: bold;
+    color: #ffffff;
+    font-size: 22px;
+    font-family:Palatino Linotype;
+    text-align: center;
+}
+
+#submit-button {
+    top: 0%;
+    left: -20%;
+    transform: translate(-160%, 20%);
+    -ms-transform: translate(-160%, 20%);
+    background-color: #f1f1f1;
+    color: black;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+}
+
+#submit-button:hover {
+    background-color: black;
+    color: white;
+}
