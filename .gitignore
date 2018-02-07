@@ -3,3 +3,6 @@ venv
 .env
 db.sqlite3
 ./django-bot
+./staticfiles
+./bot/static/images
+./static
