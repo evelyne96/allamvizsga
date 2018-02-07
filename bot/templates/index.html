@@ -6,30 +6,31 @@
     <script src="{% static 'javascript/bot.js' %}"></script>  
     <title>{{ title }}</title>
 </head>
-<body>
-    <div class="scroll" id="data">
-    {% for message in messages %}
-        {% if forloop.counter0|divisibleby:2 %} 
-        <div class="container darker" >
-            <p>{{  message.text }}</p>
-            <span class="timeLeft">{{message.time}}</span>
-        </div>
-        {% endif %}
+<body id="bg" style="background:url('/static/{{ background }}')";>
+    <div class="box leftcenter">
 
-        {% if not forloop.counter0|divisibleby:2 %} 
-            <div class="container" >
-                <p>{{  message.text }}</p>
-                <span class="timeLeft">{{message.time}}</span>
-            </div>
-        {% endif %}
-    {% endfor %}
+    <div class="character-speach-bubble">
+            <textarea cols="100" name="text" id="bubbleText" readonly>
+            {% for message in messages %}
+                {{  message.text }}
+            {% endfor %}
+            </textarea>
     </div>
 
-    <form action="post/message" class = "center" method="post">
-        {% csrf_token %}
-        Message: 
-        <textarea cols="100" name="text"></textarea>
-        <input type="submit" value="Submit">
-    </form>
+    <div class = "speach-box">
+        <img src='/static/{{ gamer }}' alt="gamer" id="gamer">
+
+        <form action="post/message" class="speech-bubble" method="post">
+                {% csrf_token %}
+                <textarea cols="100" name="text" id="bubbleText"></textarea>
+                <input type="submit" id="submit-button" align="left" value="Submit">
+        </form>
+    </div>
+
+    </div>
+    <!--
+   
+-->
+    <img src='/static/{{ character }}' alt="character" id="character">
 </body>
 </html>
