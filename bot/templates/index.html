@@ -40,7 +40,7 @@
             <div class="character-speach-bubble">
                 <textarea cols="100" name="text" id="bubbleText" readonly>
                     {% for message in messages %}
-                        {{  message.text }}
+                        {{  message.sentimentText }}
                     {% endfor %}
                 </textarea>
             </div>
