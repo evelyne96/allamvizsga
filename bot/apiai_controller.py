@@ -4,7 +4,7 @@ import json
 class AiController:
     """This class does helps with the methodes to control my ai."""
 
-    CLIENT_ACCESS_TOKEN = 'ba4d6950457e44fba1ac958c7ff19a9d'
+    CLIENT_ACCESS_TOKEN = 'd031bde1cf5b4c26b60326fe8c395ef7'
     ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN)
 
     def send_text_message(self, sender_id, text_message):

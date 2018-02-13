@@ -1,4 +1,4 @@
-
+/****************basicUI*************index.html**********/
 #bg{
     background-size: cover;
     margin: 0%;
@@ -57,7 +57,7 @@ div.speach-box {
 	content: '';
 	position: absolute;
 	left: 0;
-	top: 50%;
+	top: 40%;
 	width: 0;
 	height: 0;
     border: 22px solid transparent;
@@ -120,3 +120,4 @@ div.speach-box {
     background-color: black;
     color: white;
 }
+/****************basicUI*************index.html**********/
