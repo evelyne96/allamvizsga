@@ -27,7 +27,6 @@ class TrainData(models.Model):
         self.itemID = itemID
         self.sentiment = sentiment
         self.sentimentText = sentimentText
-        self.words = []
 
 
     def __str__(self):
@@ -38,6 +37,13 @@ class TrainData(models.Model):
         model = None
         if len(list) > 2:
             isCreated = True
-            model = TrainData(list[0], list[1], list[2])
+            try:
+                model = TrainData(list[0], int(list[1]), list[2])
+            except ValueError:
+                model = TrainData(list[0], 0, list[2])
+        #this is for the test case
+        if len(list) == 2:
+            isCreated = True
+            model = TrainData(list[0], -1, list[1])
         return isCreated, model
 

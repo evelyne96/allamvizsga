@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from . import apiai_controller as ai_controller
 from . import models as model
 from .utils import file_control as fc
-from . import sentiment_tf_idf 
+from . import sentiment_analyzer
 
 # Create your views here.
 def index(request):
@@ -17,13 +17,13 @@ def index(request):
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
     fc.append_to(filename, text)
     messages.append(model.Message(text, datetime.datetime.now()))
-    tfidf = sentiment_tf_idf.SentimentAnalyzer()
-    r = tfidf.eliminateStopWords()
-    l = []
-    l.append(r[1])
+    
+    # sa = sentiment_analyzer.SentimentAnalyzer()
+    # sa.test_multinomial_naive_bayes()
+
     context = {
         'title': "Chatbot.",
-        'messages': l,
+        'messages': messages,
         'background' : "images/wallpaper/happy/2.jpg",
         'character' : "images/female/Koko/talk2.png",
         'gamer' : "images/male/Gamers/5.png",
