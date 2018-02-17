@@ -4,9 +4,10 @@ import string
 import re
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.stem import SnowballStemmer
 from .utils import file_control
 from . import models
-from sklearn.feature_extraction.text import TfidfTransformer,CountVectorizer,TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 import numpy as np
  
@@ -26,6 +27,7 @@ class SentimentAnalyzer:
         list = file_control.read_from_csv(filename, model)
         return list
 
+#preproceccing data
     def eliminateStopWords(self,trainData):
         for data in trainData:
             #since the data is from twitter I will eliminate the user names
@@ -37,13 +39,18 @@ class SentimentAnalyzer:
 
         return trainData
 
+    #stemming!!!
+    def tokenize(self,text):
+        stemmer = SnowballStemmer("english")
+        stems = [stemmer.stem(t) for t in word_tokenize(text)]
+        return stems
+#preproceccing data DONE
+
+
 #Naive Bayes.
     def multinomial_naive_bayes(self):
         traindt = models.TrainData(0,1,'happy')
-        #read de training set from file
         trainData = self.readTrainData(traindt)
-
-        #TODO stemming!!!
         #eliminate the user names since the stop words will be eliminated by scikit tfidfrepresentation
         trainData = self.eliminateStopWords(trainData)
 
@@ -51,7 +58,8 @@ class SentimentAnalyzer:
         #so basically we will get the vocabulary of every word used except the stop words
         #this is a dictionary of word:id pair
         vectorizer = TfidfVectorizer(norm='l2',min_df=0, use_idf=True, smooth_idf=False,
-                                         sublinear_tf=True, stop_words=self.stop_words)
+                                    sublinear_tf=True, stop_words=self.stop_words, tokenizer=self.tokenize,
+                                    analyzer='word')
         #this will give us the tf * idf weight for every word in our documents in (documentNR, wordID) -> tf_idf pairs
         train_features = vectorizer.fit_transform([d.sentimentText for d in trainData])
         #Multinomial naive bayes
@@ -64,14 +72,13 @@ class SentimentAnalyzer:
 
     def test_multinomial_naive_bayes(self):
         traindt = models.TrainData(0,1,'happy')
-        testData = self.readTestData(traindt)
-        testData = self.eliminateStopWords(testData)
+        # testData = self.readTestData(traindt)
+        # testData = self.eliminateStopWords(testData)
         nb, vectorizer = self.multinomial_naive_bayes()
 
-        test_features = vectorizer.transform([d.sentimentText for d in testData])
-        predictions = nb.predict(test_features)
-        for p in predictions:
-            file_control.append_to("test.txt", str(p))
+        #test_features = vectorizer.transform([d.sentimentText for d in testData])
+        #predictions = nb.predict(test_features)
+        file_control.append_to("test.txt", str(vectorizer.vocabulary_))
 
 
 
