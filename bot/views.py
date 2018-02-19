@@ -19,9 +19,6 @@ def index(request):
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
     fc.append_to(filename, text)
 
-    # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
-    # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
-
     sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
     data = sentiment.vectorizer.transform([contents[-1]])
     # prediction = sentiment.nb_cls.predict(data)
@@ -31,6 +28,7 @@ def index(request):
         sentiment = " = negative"
     else:
         sentiment = " = positive"
+    messages.append(model.Message(text, datetime.datetime.now()))
     messages.append(model.Message(contents[-1]+sentiment, datetime.datetime.now()))
 
     context = {
