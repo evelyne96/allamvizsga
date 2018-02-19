@@ -16,23 +16,22 @@ def index(request):
     filename = "conversation.txt"
     contents =  fc.read_from(filename)
     #the last message is the one that was sent to the bot right now
-    if len(contents[-1]) != 0:
+    if len(contents) != 0:
         text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
+        sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
+        data = sentiment.vectorizer.transform([contents[-1]])
+        # prediction = sentiment.nb_cls.predict(data)
+        prediction = sentiment.svm_cls.predict(data)
+    
+        if prediction[0] == 0:
+            sentiment = " = negative"
+        else:
+            sentiment = " = positive"
+        messages.append(model.Message(contents[-1]+sentiment, datetime.datetime.now()))
     else:
          text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
-    fc.append_to(filename, text)
-
-    sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
-    data = sentiment.vectorizer.transform([contents[-1]])
-    # prediction = sentiment.nb_cls.predict(data)
-    prediction = sentiment.svm_cls.predict(data)
-    
-    if prediction[0] == 0:
-        sentiment = " = negative"
-    else:
-        sentiment = " = positive"
     messages.append(model.Message(text, datetime.datetime.now()))
-    messages.append(model.Message(contents[-1]+sentiment, datetime.datetime.now()))
+    fc.write_to(filename, "")
 
     context = {
         'title': "Chatbot.",
