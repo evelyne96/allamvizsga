@@ -16,7 +16,10 @@ def index(request):
     filename = "conversation.txt"
     contents =  fc.read_from(filename)
     #the last message is the one that was sent to the bot right now
-    text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
+    if len(contents[-1]) != 0:
+        text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
+    else:
+         text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
     fc.append_to(filename, text)
 
     sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
@@ -45,7 +48,5 @@ def post_message(request):
     """Post new message"""
     sent_text = request.POST['text']
     filename = "conversation.txt"
-    file = open(filename, "a+")
-    file.write('\n'+sent_text)
-    file.close()
+    fc.write_to(filename, sent_text)
     return redirect('index')
