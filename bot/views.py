@@ -6,10 +6,9 @@ from . import models as model
 from .utils import file_control as fc
 from . import sentiment_analyzer
 import pickle
-from sklearn.feature_extraction.text import TfidfVectorizer
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import SnowballStemmer
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 
 # Create your views here.
 def index(request):
@@ -21,7 +20,7 @@ def index(request):
     #the last message is the one that was sent to the bot right now
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
     fc.append_to(filename, text)
-    
+
     # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
     # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
 
@@ -54,8 +53,3 @@ def post_message(request):
     file.write('\n'+sent_text)
     file.close()
     return redirect('index')
-
-def tokenize(text):
-        stemmer = SnowballStemmer("english")
-        stems = [stemmer.stem(t) for t in word_tokenize(text)]
-        return stems
