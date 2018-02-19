@@ -6,9 +6,7 @@ from . import models as model
 from .utils import file_control as fc
 from . import sentiment_analyzer
 import pickle
-import nltk
-nltk.download('stopwords')
-nltk.download('punkt')
+
 
 # Create your views here.
 def index(request):
