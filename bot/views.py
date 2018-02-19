@@ -5,6 +5,11 @@ from . import apiai_controller as ai_controller
 from . import models as model
 from .utils import file_control as fc
 from . import sentiment_analyzer
+import pickle
+from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import SnowballStemmer
 
 # Create your views here.
 def index(request):
@@ -16,10 +21,20 @@ def index(request):
     #the last message is the one that was sent to the bot right now
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
     fc.append_to(filename, text)
-    messages.append(model.Message(text, datetime.datetime.now()))
     
-    # sa = sentiment_analyzer.SentimentAnalyzer()
-    # sa.test_multinomial_naive_bayes()
+    # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
+    # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
+
+    sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
+    data = sentiment.vectorizer.transform([contents[-1]])
+    # prediction = sentiment.nb_cls.predict(data)
+    prediction = sentiment.svm_cls.predict(data)
+    
+    if prediction[0] == 0:
+        sentiment = " = negative"
+    else:
+        sentiment = " = positive"
+    messages.append(model.Message(contents[-1]+sentiment, datetime.datetime.now()))
 
     context = {
         'title': "Chatbot.",
@@ -39,3 +54,8 @@ def post_message(request):
     file.write('\n'+sent_text)
     file.close()
     return redirect('index')
+
+def tokenize(text):
+        stemmer = SnowballStemmer("english")
+        stems = [stemmer.stem(t) for t in word_tokenize(text)]
+        return stems

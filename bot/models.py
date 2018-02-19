@@ -44,6 +44,6 @@ class TrainData(models.Model):
         #this is for the test case
         if len(list) == 2:
             isCreated = True
-            model = TrainData(list[0], -1, list[1])
+            model = TrainData(list[0], 0, list[1])
         return isCreated, model
 
