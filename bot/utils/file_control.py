@@ -28,6 +28,22 @@ def read_from_csv(filename,model):
                     modelList.append(created)
     return modelList
 
+def read_tsv(filename):
+    modelText = []
+    modelSentiment = []
+    if os.path.exists(filename):
+        with open(filename) as file:
+            reader = csv.reader(file,  delimiter='\t')
+            for row in reader:
+                if row[3] == 0 or row[3] == 1:
+                    modelSentiment.append(0)
+                    modelText.append(row[2])
+                else:
+                    if modelSentiment != 2:
+                        modelSentiment.append(1)
+                        modelText.append(row[2])
+    return modelText, modelSentiment
+
 def write_to(filename,content):
     file = open(filename, "w")
     file.write(str(content))

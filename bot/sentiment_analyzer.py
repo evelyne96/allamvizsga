@@ -16,10 +16,10 @@ class SentimentAnalyzer:
 
     def __init__(self):
         print("init sentiment analyzer")
-        trainD, self.train_features, self.vectorizer = self.getTrainFeature()
-        self.trainData = [d.sentiment for d in trainD]
-        self.svm_cls = self.svm_classifier()
-        self.nb_cls = self.multinomial_naive_bayes()
+        trainD, train_features, self.vectorizer = self.getTrainFeature()
+        trainData = [d.sentiment for d in trainD]
+        self.svm_cls = self.svm_classifier(trainData, train_features)
+        self.nb_cls = self.multinomial_naive_bayes(trainData, train_features)
 
     def readTrainData(self, model):
         filename = os.path.join(os.getcwd(), 'bot', 'static', 'sentimentAnalysis', 'train.csv')
@@ -62,20 +62,21 @@ class SentimentAnalyzer:
         return trainData, train_features, vectorizer
 
 #Naive Bayes.
-    def multinomial_naive_bayes(self):
+    def multinomial_naive_bayes(self, trainData, trainFeature):
         #Multinomial naive bayes
         nb = MultinomialNB()
         #setiment = 1 or 0 where 0 = negative, 1 = positive
-        nb.fit(self.train_features, self.trainData)
+        nb.fit(trainFeature, trainData)
         #trained naive bayes classifier that can do predictions
         return nb
 
 #Nive Bayes DONE
 
 #SVM
-    def svm_classifier(self):
+    def svm_classifier(self,trainData, trainFeature):
         clf = svm.LinearSVC()
-        clf.fit(self.train_features, self.trainData)  
+        # clf = svm.SVC()
+        clf.fit(trainFeature, trainData)  
         return clf
 
 
