@@ -6,3 +6,4 @@ db.sqlite3
 /bot/static/images/
 /bot/static/sentimentAnalysis
 /static/
+/staticfiles/sentimentAnalysis

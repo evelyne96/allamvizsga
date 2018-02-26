@@ -1,10 +1,9 @@
 /****************basicUI*************index.html**********/
 #bg{
     background-size: cover;
-	background-color: red;
     margin: 0%;
     padding: 0%;
-    color: black;
+    background-color: #704fa0;
     z-index: -1;
 }
 
@@ -21,6 +20,7 @@
     width: 20%;
     height: 100%;
 }
+
 
 div.leftcenter {
     width: 50%;
@@ -122,3 +122,45 @@ div.speach-box {
     color: white;
 }
 /****************basicUI*************index.html**********/
+
+/*******************signup******************************/
+
+.logbox {
+  background: #1c1c1c;
+  padding-left: 40px;
+  pedding-right: 40px;
+  padding-top:20px;
+  max-width: 600px;
+  height: 90%;
+  margin: 40px auto;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
+  box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
+}
+
+input, textarea {
+  font-size: 16px;
+  display: block;
+  padding: 5px 10px;
+  width: 90%;
+  background: none;
+  background-image: none;
+  border: 1px solid #a0b3b0;
+  color: white;
+  border-radius: 0;
+  -webkit-transition: border-color .20s ease, -webkit-box-shadow .20s ease;
+  transition: border-color .20s ease, -webkit-box-shadow .20s ease;
+  transition: border-color .20s ease, box-shadow .20s ease;
+  transition: border-color .20s ease, box-shadow .20s ease, -webkit-box-shadow .20s ease;
+}
+input:focus, textarea:focus {
+  outline: 0;
+  border-color: #704fa0;
+}
+
+input[type=text] {
+    color: white;
+}
+
+
+/************************signup***********************************/
