@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bot',
+    'authenticate',
 ]
 
 MIDDLEWARE = [
@@ -75,12 +76,24 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+#for localhost
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+       'NAME': 'visualnovel',
+       'USER': 'visualuser',
+       'PASSWORD': 'password',
+       'HOST': 'localhost',
+       'PORT': '',
+   }
 }
+
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config(conn_max_age=600)
+
+
+LOGIN_REDIRECT_URL=('/bot')
+LOGIN_URL = ('/login')
 
 
 # Password validation

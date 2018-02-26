@@ -8,8 +8,11 @@ from . import sentiment_analyzer
 import pickle
 from sklearn.metrics import accuracy_score
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from myapp import settings
+from authenticate import models as auth_model
 
-# Create your views here.
+@login_required(login_url='/login/')
 def index(request):
     """ index """
     my_ai = ai_controller.AiController()
@@ -18,7 +21,6 @@ def index(request):
     contents =  fc.read_from(filename)
     # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
     # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
-
 
     #the last message is the one that was sent to the bot right now
     if len(contents) != 0:
@@ -32,11 +34,17 @@ def index(request):
             sentiment = " = negative"
         else:
             sentiment = " = positive"
-        messages.append(model.Message(contents[-1]+sentiment, datetime.datetime.now()))
+        m = model.Message(text = contents[-1]+sentiment,time=datetime.datetime.now())
+        messages.append(m)
+        m.save()
     else:
          text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
-    messages.append(model.Message(text, datetime.datetime.now()))
+    messages.append(model.Message(text=text,time=datetime.datetime.now()))
     fc.write_to(filename, "")
+
+    all_entries = model.Message.objects.all()
+    for m in all_entries:
+        print(m.text)
 
     context = {
         'title': "Chatbot.",
@@ -46,7 +54,7 @@ def index(request):
         'gamer' : "images/male/Gamers/5.png",
         'characterName' : "Koko"
     }
-    return render(request, 'index.html', context)
+    return render(request, 'content.html', context)
 
 def post_message(request):
     """Post new message"""

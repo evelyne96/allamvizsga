@@ -1,0 +1,46 @@
+{% load staticfiles %}
+<html>
+<head>
+    <link rel="icon" href="{% static '/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'stylesheets/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'stylesheets/sidebar.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+    <script src="{% static 'javascript/bot.js'%}"></script>
+    <title>{{ title }}</title>
+</head>
+<body id="bg" style="background-color:#704fa0;">
+  <div id="wrapper"> 
+      <div class="overlay"></div>       
+      <!-- Sidebar -->
+      <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
+              <ul class="nav sidebar-nav">
+                  <li class="sidebar-brand">
+                      <a href="#">
+                         Bootstrap 3
+                      </a>
+                  </li>
+                  <li>
+                      <a href={% url 'bot' %}><i class="fa fa-fw fa-home"></i> Home</a>
+                  </li>
+                  {% if user.is_authenticated %}
+                  <li> <a href={% url 'logout' %}> <i class="fa fa-user-times"></i> Log Out</a> </li>
+                  {% endif %}
+                  <hr>
+              </ul>
+          </nav>
+          <!-- /#sidebar-wrapper -->
+    <div id="page-content-wrapper">
+        <button type="button" class="hamburger is-closed animated fadeInLeft" data-toggle="offcanvas">
+            <span class="hamb-top"></span>
+            <span class="hamb-middle"></span>
+            <span class="hamb-bottom"></span>
+        </button>
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+</body>
+</html>
