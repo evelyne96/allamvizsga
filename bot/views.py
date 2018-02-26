@@ -19,6 +19,11 @@ def index(request):
     messages = []
     filename = "conversation.txt"
     contents =  fc.read_from(filename)
+
+    allusers = auth_model.Profile.objects.all()
+    for m in allusers:
+        print(m.first_name)
+
     # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
     # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
 
