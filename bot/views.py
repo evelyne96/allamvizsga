@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from myapp import settings
-from authenticate import models as auth_model
+from authenticate.models import Profile
 
 @login_required(login_url='/login/')
 def index(request):
@@ -20,7 +20,7 @@ def index(request):
     filename = "conversation.txt"
     contents =  fc.read_from(filename)
 
-    allusers = auth_model.Profile.objects.all()
+    allusers = Profile.objects.all()
     for m in allusers:
         print(m.first_name)
 
@@ -66,7 +66,32 @@ def post_message(request):
     sent_text = request.POST['text']
     filename = "conversation.txt"
     fc.write_to(filename, sent_text)
-    return redirect('index')
+    return redirect('bot')
+
+def getProfileByUserId(id):
+    current_profile = Profile.objects.filter(user_id=id)
+    return current_profile[0]
+
+def getGamersName():
+    n = 1
+    gamers = []
+    while n < 6 :
+        male = "images/male/Gamers/"+str(n)+".png"
+        female = "images/female/Gamers/"+str(n)+".png"
+       # gamers.append(male)
+        gamers.append(female)
+        n += 1
+    return gamers
+
+def settings(request):
+    current_profile = getProfileByUserId(request.user.id)
+    gamers = getGamersName()
+    print(current_profile.character_name)
+    context = { 'gamers' : gamers,
+                'username' : current_profile.first_name,
+                'userCharacter' : current_profile.character_name
+              }
+    return render(request, 'settings.html', context)
 
 def test_sentiment(request):
     """Test"""

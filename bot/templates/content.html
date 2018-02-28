@@ -1,14 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base2.html' %}
 
 {% block content %}
-
-<div id="page-content-wrapper">
-        <button type="button" class="hamburger is-closed animated fadeInLeft" data-toggle="offcanvas">
-                    <span class="hamb-top"></span>
-                    <span class="hamb-middle"></span>
-                    <span class="hamb-bottom"></span>
-        </button>
-
         <div class="box leftcenter">
             <div class="character-speach-bubble">
                 <textarea cols="100" name="text" id="bubbleText" readonly>
@@ -19,9 +11,8 @@
             </div>
 
             <div class = "speach-box">
-                <img src='/static/{{ gamer }}' alt="gamer" id="gamer">
-
-                <form action="post/message" class="speech-bubble" method="post">
+                    <img src='/static/{{ gamer }}' alt="gamer" id="gamer">
+                <form action={% url 'post_message' %} class="speech-bubble" method="post">
                     {% csrf_token %}
                     <textarea cols="100" name="text" id="bubbleText"></textarea>
                     <input type="submit" id="submit-button" align="left" value="Submit">
@@ -30,5 +21,4 @@
 
         </div>
         <img src='/static/{{ character }}' alt="character" id="character">
-    </div>
 {% endblock %}

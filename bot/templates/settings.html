@@ -1,0 +1,19 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+<div class="settings-container">
+
+    <div class="account-info aside">
+        <img src= '/static/{{ userCharacter }}' style="height: 10em; width:10em;"> 
+        <p> {{ username }}</p>
+    </div>
+
+    <div class="settings-form">
+        <ul class='circle-container'> 
+            {% for gamer in gamers %}
+            <li> <img src= '/static/{{ gamer }}' > </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
