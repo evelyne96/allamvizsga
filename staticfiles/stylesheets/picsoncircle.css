@@ -1,0 +1,87 @@
+.circle-container {
+    position: relative;
+    width: 16em;
+    height: 16em;
+    border-radius: 50%;
+    padding: 0;
+    list-style: none;
+    margin: 5em auto 0;
+    border: solid 5px tomato;
+  }
+  .circle-container > * {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -3em;
+    width: 6em;
+    height: 6em;
+  }
+  .circle-container > *:nth-of-type(1) {
+    -webkit-transform: rotate(0deg) translate(8em) rotate(0deg);
+            transform: rotate(0deg) translate(8em) rotate(0deg);
+  }
+  .circle-container > *:nth-of-type(2) {
+    -webkit-transform: rotate(72deg) translate(8em) rotate(-72deg);
+            transform: rotate(72deg) translate(8em) rotate(-72deg);
+  }
+  .circle-container > *:nth-of-type(3) {
+    -webkit-transform: rotate(144deg) translate(8em) rotate(-144deg);
+            transform: rotate(144deg) translate(8em) rotate(-144deg);
+  }
+  .circle-container > *:nth-of-type(4) {
+    -webkit-transform: rotate(216deg) translate(8em) rotate(-216deg);
+            transform: rotate(216deg) translate(8em) rotate(-216deg);
+  }
+  .circle-container > *:nth-of-type(5) {
+    -webkit-transform: rotate(288deg) translate(8em) rotate(-288deg);
+            transform: rotate(288deg) translate(8em) rotate(-288deg);
+  }
+
+  .circle-container img {
+    display: block;
+    max-width: 100%;
+    border-radius: 50%;
+    -webkit-filter: grayscale(100%);
+            filter: grayscale(100%);
+    border: solid 5px tomato;
+    -webkit-transition: .15s;
+    transition: .15s;
+  }
+  .circle-container img:hover {
+    -webkit-filter: grayscale(0);
+            filter: grayscale(0);
+  }
+
+  .settings-container{
+    display: flex;  
+    flex-flow: row wrap;
+    font-weight: bold;
+    text-align: center;
+    height: 100%;
+  }
+  
+  .settings-container > * {
+    padding: 10px;
+    flex: 1 100%;
+  }
+
+  .account-info{
+    background: gold;
+  }
+
+  .settings-form {
+    text-align: left;
+    background: deepskyblue;
+  }
+
+  @media all and (min-width: 600px) {
+    .aside { flex: 1 auto; }
+  }
+  
+  @media all and (min-width: 800px) {
+    .settings-form   { flex: 3 0px; }
+    .aside { order: 1; } 
+    .settings-form    { order: 2; }
+  }
+  
