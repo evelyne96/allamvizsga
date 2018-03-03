@@ -79,6 +79,13 @@ class SentimentAnalyzer:
         clf.fit(trainFeature, trainData)  
         return clf
 
+    def tune_svm_parameters(self, trainData, trainFeature):
+        # Intuitively, the gamma parameter defines how far the influence of a single training example
+        #  reaches, with low values meaning ‘far’ and high values meaning ‘close’. The gamma parameters 
+        #  can be seen as the inverse of the radius of influence of samples selected by the model as support vectors.
+        C_range = np.logspace(-2, 10, 13)
+        gamma_range = np.logspace(-9, 3, 13)
+
 
 
 

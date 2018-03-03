@@ -3,19 +3,17 @@
 {% block content %}
         <div class="box leftcenter">
             <div class="character-speach-bubble">
-                <textarea cols="100" name="text" id="bubbleText" readonly>
-                    {% for message in messages %}
-                        {{  message.text  }}
-                    {% endfor %}
+                <textarea cols="100" name="text1" class="bubbleText" id="botSays" readonly>
+                   {{ message}}
                 </textarea>
             </div>
 
             <div class = "speach-box">
-                    <img src='/static/{{ gamer }}' alt="gamer" id="gamer">
-                <form action={% url 'post_message' %} class="speech-bubble" method="post">
+                <img src='/static/{{ gamer }}' alt="gamer" id="gamer">
+                <form action={% url 'post_message' %} class="speech-bubble" method="post" id="sendToBotForm">
                     {% csrf_token %}
-                    <textarea cols="100" name="text" id="bubbleText"></textarea>
-                    <input type="submit" id="submit-button" align="left" value="Submit">
+                    <textarea cols="100" name="sent_text" class="bubbleText" id="messageToBot"></textarea>
+                    <input type="button" id="submit-button" align="left" value="Submit" onclick="sendMessage()">
                 </form>
             </div>
 

@@ -9,10 +9,13 @@
     <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+    <script> 
+        var mood = "{{ mood }}";
+    </script>
     <script src="{% static 'javascript/bot.js'%}"></script>
     <title>{{ title }}</title>
 </head>
-<body id="bg" class="radial-gradient" style="background-color:#704fa0;">
+<body id="bg">
   <div id="wrapper"> 
       <div class="overlay"></div>       
       <!-- Sidebar -->
@@ -20,7 +23,7 @@
               <ul class="nav sidebar-nav">
                   <li class="sidebar-brand">
                       <a href="#">
-                         Bootstrap 3
+                         {{title}}
                       </a>
                   </li>
                   <li>

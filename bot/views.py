@@ -11,62 +11,67 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from myapp import settings
 from authenticate.models import Profile
+import json
 
 @login_required(login_url='/login/')
 def index(request):
     """ index """
-    my_ai = ai_controller.AiController()
-    messages = []
-    filename = "conversation.txt"
-    contents =  fc.read_from(filename)
-
-    allusers = Profile.objects.all()
-    for m in allusers:
-        print(m.first_name)
-
     # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
     # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
-
-    #the last message is the one that was sent to the bot right now
-    if len(contents) != 0:
-        text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", contents[-1]))
-        sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
-        data = sentiment.vectorizer.transform([contents[-1]])
-        # prediction = sentiment.nb_cls.predict(data)
-        prediction = sentiment.svm_cls.predict(data)
-    
-        if prediction[0] == 0:
-            sentiment = " = negative"
-        else:
-            sentiment = " = positive"
-        m = model.Message(text = contents[-1]+sentiment,time=datetime.datetime.now())
-        messages.append(m)
-        m.save()
-    else:
-         text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
-    messages.append(model.Message(text=text,time=datetime.datetime.now()))
-    fc.write_to(filename, "")
-
-    all_entries = model.Message.objects.all()
-    for m in all_entries:
-        print(m.text)
-
+    my_ai = ai_controller.AiController()
+    messages = []
+    text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
+    messages.append(model.Message(text, datetime.datetime.now()))
+    current_profile = getProfileByUserId(request.user.id)
     context = {
-        'title': "Chatbot.",
-        'messages': messages,
-        'background' : "images/wallpaper/happy/2.jpg",
-        'character' : "images/female/Koko/talk2.png",
-        'gamer' : "images/male/Gamers/5.png",
-        'characterName' : "Koko"
+        'title': "Visual Novel",
+        'message': text,
+        'character' : current_profile.companion,
+        'gamer' : current_profile.character_name,
+        'mood' : current_profile.mood
     }
     return render(request, 'content.html', context)
 
+@login_required(login_url='/login/')
 def post_message(request):
     """Post new message"""
-    sent_text = request.POST['text']
-    filename = "conversation.txt"
-    fc.write_to(filename, sent_text)
-    return redirect('bot')
+    import json
+    data = json.loads(request.body); sent_text = data['sent_text']
+    my_ai = ai_controller.AiController()
+    current_profile = getProfileByUserId(request.user.id)
+
+    if len(sent_text) != 0:
+        answer = my_ai.get_text_from_response(my_ai.send_text_message("12345678", sent_text))
+        sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
+        data = sentiment.vectorizer.transform([sent_text])
+        # prediction = sentiment.nb_cls.predict(data)
+        prediction = sentiment.svm_cls.predict(data)
+        if prediction[0] == 0 and current_profile.mood > (-4):
+            current_profile.mood -= 1
+            current_profile.save()
+            #negative
+        elif current_profile.mood < 4:
+            #positive
+            current_profile.mood += 1
+            current_profile.save()
+        # m = model.Message(text = sent_text+sentiment,time=datetime.datetime.now())
+        # m.save()
+    else:
+         answer = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
+
+    data = { 'answer' : answer, 'mood' : current_profile.mood}
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+def settings(request):
+    current_profile = getProfileByUserId(request.user.id)
+    gamers = getGamersName()
+    print(current_profile.character_name)
+    context = { 'gamers' : gamers,
+                'username' : current_profile.first_name,
+                'userCharacter' : current_profile.character_name
+              }
+    return render(request, 'settings.html', context)
+
 
 def getProfileByUserId(id):
     current_profile = Profile.objects.filter(user_id=id)
@@ -82,16 +87,6 @@ def getGamersName():
         gamers.append(female)
         n += 1
     return gamers
-
-def settings(request):
-    current_profile = getProfileByUserId(request.user.id)
-    gamers = getGamersName()
-    print(current_profile.character_name)
-    context = { 'gamers' : gamers,
-                'username' : current_profile.first_name,
-                'userCharacter' : current_profile.character_name
-              }
-    return render(request, 'settings.html', context)
 
 def test_sentiment(request):
     """Test"""
