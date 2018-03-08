@@ -26,7 +26,8 @@ def index(request):
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
     messages.append(model.Message(text, datetime.datetime.now()))
     current_profile = getProfileByUserId(request.user.id)
-    current_profile.character_name = 'images/female/Koko/talk2.png'
+    current_profile.companion = 'images/female/Koko/talk2.png'
+    current_profile.save()
     context = {
         'title': "Visual Novel",
         'message': text,
