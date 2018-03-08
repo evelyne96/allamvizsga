@@ -18,6 +18,9 @@ def index(request):
     """ index """
     # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
     # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
+    sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
+    sentiment.vectorizer
+
     my_ai = ai_controller.AiController()
     messages = []
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
@@ -43,7 +46,7 @@ def post_message(request):
     if len(sent_text) != 0:
         answer = my_ai.get_text_from_response(my_ai.send_text_message("12345678", sent_text))
         sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
-        data = sentiment.vectorizer.transform([sent_text])
+        data = sentiment.vectorizer.transform([answer])
         # prediction = sentiment.nb_cls.predict(data)
         prediction = sentiment.svm_cls.predict(data)
         if prediction[0] == 0 and current_profile.mood > (-4):
@@ -59,7 +62,7 @@ def post_message(request):
     else:
          answer = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
 
-    data = { 'answer' : answer, 'mood' : current_profile.mood}
+    data = { 'answer' : answer+" "+prediction[0], 'mood' : current_profile.mood}
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 def settings(request):
