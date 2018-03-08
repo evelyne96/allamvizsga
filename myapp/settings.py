@@ -77,19 +77,19 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 #for localhost
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql_psycopg2',
-       'NAME': 'visualnovel',
-       'USER': 'visualuser',
-       'PASSWORD': 'password',
-       'HOST': 'localhost',
-       'PORT': '',
-   }
-}
+#DATABASES = {
+#   'default': {
+#       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#       'NAME': 'visualnovel',
+#       'USER': 'visualuser',
+#       'PASSWORD': 'password',
+#       'HOST': 'localhost',
+#       'PORT': '',
+#   }
+#}
 
-#import dj_database_url
-#DATABASES['default'] =  dj_database_url.config(conn_max_age=600)
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config(conn_max_age=600)
 
 
 LOGIN_REDIRECT_URL=('/bot')
