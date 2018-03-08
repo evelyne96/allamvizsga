@@ -26,6 +26,8 @@ def index(request):
     text = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
     messages.append(model.Message(text, datetime.datetime.now()))
     current_profile = getProfileByUserId(request.user.id)
+    current_profile.mood = 0
+    current_profile.save()
     context = {
         'title': "Visual Novel",
         'message': text,
@@ -39,23 +41,20 @@ def index(request):
 def post_message(request):
     """Post new message"""
     import json
-    print(request.body)
     data = json.loads(request.body); sent_text = data['sent_text']
     my_ai = ai_controller.AiController()
     current_profile = getProfileByUserId(request.user.id)
-    print("sent:  "+sent_text)
     if len(sent_text) != 0:
         answer = my_ai.get_text_from_response(my_ai.send_text_message(request.session.session_key, sent_text))
-        print(answer)
         sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
         data = sentiment.vectorizer.transform([answer])
         # prediction = sentiment.nb_cls.predict(data)
         prediction = sentiment.svm_cls.predict(data)
-        if prediction[0] == 0 and current_profile.mood > (-4):
+        if prediction[0] == 0 and current_profile.mood > (-7):
             current_profile.mood -= 1
             current_profile.save()
             #negative
-        elif current_profile.mood < 4:
+        elif current_profile.mood < 7:
             #positive
             current_profile.mood += 1
             current_profile.save()

@@ -69,10 +69,7 @@ function sendMessage() {
         if (data.answer) {
           $('#messageToBot').val('');
           $('#botSays').val(data.answer);
-          if (data.mood > -3 && data.mood < 3) {
-            console.log("set color")
-             setColorByMood(data.mood)
-            }
+           setColorByMood(data.mood)
         }
       },
       error: function (xhr, ajaxOptions, thrownError) {
@@ -106,8 +103,8 @@ function lighten(color, luminosity) {
 
 function setColorByMood(myMood){
   if (mood != null) {
-      c1 = lighten(firstColor, 0.1 * myMood);
-      c2 = lighten(secondColor, 0.1 * myMood);
+      c1 = lighten(firstColor, 0.08 * myMood);
+      c2 = lighten(secondColor, 0.08 * myMood);
       setBackgroundColor("bottom right", c2, c1);
   }
 }
