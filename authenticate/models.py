@@ -12,7 +12,7 @@ class Profile(models.Model):
     email = models.CharField(max_length=254, blank=False)
     email_confirmed = models.BooleanField(default=False)
     character_name = models.CharField(max_length=254)
-    companion = models.CharField(max_length=254)
+    companion = models.CharField(max_length=254, default='images/female/Koko/talk.png')
     mood = models.IntegerField(default=0)
     story_type = models.CharField(max_length=254)
 
