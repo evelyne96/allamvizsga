@@ -39,12 +39,14 @@ def index(request):
 def post_message(request):
     """Post new message"""
     import json
+    print(request.body)
     data = json.loads(request.body); sent_text = data['sent_text']
     my_ai = ai_controller.AiController()
     current_profile = getProfileByUserId(request.user.id)
-
+    print("sent:  "+sent_text)
     if len(sent_text) != 0:
-        answer = my_ai.get_text_from_response(my_ai.send_text_message("12345678", sent_text))
+        answer = my_ai.get_text_from_response(my_ai.send_text_message(request.session.session_key, sent_text))
+        print(answer)
         sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
         data = sentiment.vectorizer.transform([answer])
         # prediction = sentiment.nb_cls.predict(data)
@@ -60,9 +62,9 @@ def post_message(request):
         # m = model.Message(text = sent_text+sentiment,time=datetime.datetime.now())
         # m.save()
     else:
-         answer = my_ai.get_text_from_response(my_ai.send_text_message("12345678", 'Hi'))
+         answer = my_ai.get_text_from_response(my_ai.send_text_message(request.session.session_key, 'Hi'))
 
-    data = { 'answer' : answer+" "+prediction[0], 'mood' : current_profile.mood}
+    data = { 'answer' : answer, 'mood' : current_profile.mood}
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 def settings(request):

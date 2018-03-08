@@ -59,7 +59,6 @@ $.ajaxSetup({
 
 function sendMessage() {
   if  ($('#messageToBot').val() != '') {
-    $('#messageToBot').val('');
     $.ajax({
       type: 'POST',
       url: '/sendMessage/',
@@ -68,12 +67,16 @@ function sendMessage() {
       contentType: 'application/json;charset=UTF-8',
       success: function (data) {
         if (data.answer) {
+          $('#messageToBot').val('');
           $('#botSays').val(data.answer);
           if (data.mood > -3 && data.mood < 3) {
             console.log("set color")
              setColorByMood(data.mood)
             }
         }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        $('#botSays').val('Your message could not be sent.');
       }
     });
   }
