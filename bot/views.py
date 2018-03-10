@@ -1,25 +1,20 @@
-import datetime
-import os
+import os,pickle,datetime,json
 from django.shortcuts import render, redirect
-from . import apiai_controller as ai_controller
-from . import models as model
+from . import apiai_controller as ai_controller, models as model, sentiment_analyzer
 from .utils import file_control as fc
-from . import sentiment_analyzer
-import pickle
 from sklearn.metrics import accuracy_score
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from myapp import settings
-from authenticate.models import Profile
-import json
+from authenticate.models import Profile 
 
 @login_required(login_url='/login/')
 def index(request):
     """ index """
     # sentiment_anal = sentiment_analyzer.SentimentAnalyzer()
     # pickle.dump(sentiment_anal, open('sentiment_classifier.pkl', 'wb'))
-    sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
-    sentiment.vectorizer
+
+    #sentiment = pickle.load(open('sentiment_classifier.pkl', 'rb'))
 
     my_ai = ai_controller.AiController()
     messages = []

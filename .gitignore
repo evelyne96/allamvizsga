@@ -7,3 +7,4 @@ db.sqlite3
 /bot/static/sentimentAnalysis
 /static/
 /staticfiles/sentimentAnalysis
+/dialogflowbot/vsbotintents/
