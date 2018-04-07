@@ -4,14 +4,14 @@
 <div class="settings-container">
 
     <div class="account-info aside">
-        <img src= '/static/{{ userCharacter }}' style="height: 10em; width:10em;"> 
+        <img src= '/static/{{ userCharacter.image }}' style="height: 10em; width:10em;"> 
         <p> {{ username }}</p>
     </div>
 
     <div class="settings-form">
         <ul class='circle-container'> 
             {% for gamer in gamers %}
-            <li> <img src= '/static/{{ gamer }}' > </li>
+            <li> <img src= '/static/{{ gamer.image }}' > </li>
             {% endfor %}
         </ul>
     </div>

@@ -10,7 +10,8 @@ from django.template.loader import render_to_string
 from django.contrib.auth import logout
 
 from .forms import SignUpForm
-from .models import Profile
+from .models import Profile, UserCharacter, UserSettings
+from bot.models import BotCharacter
 
 def signup(request):
     if request.method == 'POST':
@@ -21,8 +22,9 @@ def signup(request):
             first_name = data['first_name']
             last_name = data['last_name']
             email = data['email']
-            profile = Profile(user=user, first_name=first_name, last_name=last_name,email=email,character_name = 'images/male/Gamers/5.png', story_type = 'chatbot')
+            profile = Profile(user=user, first_name=first_name, last_name=last_name,email=email)
             profile.save()
+            UserSettings(user = user,  user_character = UserCharacter.objects.all()[0], companion_character=BotCharacter.objects.all()[0], mood = 0, story_type = "bot").save()
 
             return redirect('/bot')
     else:

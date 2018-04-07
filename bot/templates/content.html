@@ -9,7 +9,7 @@
             </div>
 
             <div class = "speach-box">
-                <img src='/static/{{ gamer }}' alt="gamer" id="gamer">
+                <img src='/static/{{ gamer.image }}' alt="gamer" id="gamer">
                 <form action={% url 'post_message' %} class="speech-bubble" method="post" id="sendToBotForm">
                     {% csrf_token %}
                     <textarea cols="100" name="sent_text" class="bubbleText" id="messageToBot"></textarea>
@@ -18,5 +18,5 @@
             </div>
 
         </div>
-        <img src='/static/{{ character }}' alt="character" id="character">
+        <img src='/static/{{ character.image }}' alt="character" id="character">
 {% endblock %}

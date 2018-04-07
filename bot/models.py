@@ -1,5 +1,10 @@
 from django.db import models
 
+class BotCharacter(models.Model):
+    name = models.CharField(max_length=254)
+    gender = models.CharField(max_length=254, default='female')
+    image = models.CharField(max_length=255)
+
 class Message(models.Model):
     """Messages model"""
     text = models.CharField(max_length=70)

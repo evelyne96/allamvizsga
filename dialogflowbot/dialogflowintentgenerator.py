@@ -1,4 +1,5 @@
-import glob, os, json, re
+import glob, os, json, re, random
+from collections import OrderedDict
 from nltk.tag import pos_tag
 from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
@@ -31,7 +32,7 @@ def readIntents(fileToReadFrom):
                 for t in d['data']:
                     text = t['text']
                     #elso sorban mondatokra kene bontani es azt szavakra es abbol csinalni egy listat
-                    tokens = [t for t in word_tokenize('I was watching TV')]
+                    tokens = [t for t in word_tokenize(text)]
                     tokens = pos_tag(tokens)
                     usersays.append(tokens)
             return usersays
@@ -50,13 +51,30 @@ def wnTag(tag):
         return wordnet.ADV
     return None
 
+def getSynsetForWord(word, tag):
+    try:
+        if tag.startswith('NN'):
+            return wordnet.synset(word+'.n.01')
+        if tag.startswith('V'):
+            return wordnet.synset(word+'.v.01')
+        if tag.startswith('RB'):
+            return None
+    except:
+        return None
+
 def getSynonyms(word, tag):
     syns = [word]
     t = wnTag(tag)
     if t:
             word = wnl.lemmatize(word=word, pos=t)
-            syns = [s.lemmas()[0] for s in wordnet.synsets(word, t)]
-            syns = set([l.name() for l in syns])
+            word_synset = getSynsetForWord(word, tag)
+            syns = [s for s in wordnet.synsets(word, t)]
+            if word_synset:
+                syns = sorted(syns, key=lambda x: word_synset.wup_similarity(x), reverse=True)
+            all_syns = []
+            for s in syns:
+                all_syns = all_syns + s.lemma_names()
+            syns = list(OrderedDict.fromkeys(all_syns))
             if syns == None:
                 syns = [(word, 1)]
             syns = [ getRightForm(w, tag) for w in syns]
@@ -86,7 +104,7 @@ def getRightForm(word, tag):
         'VBD': conjugate(verb = word,tense=PAST,number=SG),
         'VBG' : conjugate(verb = word, tens = PARTICIPLE, number = SG),
         'VBN' : conjugate(verb = word, tens = PARTICIPLE, number = SG),
-        'VBP' : conjugate(verb = word,tense= PRESENT, number =SINGULAR),
+        'VBP' : conjugate(verb = word,tense= PRESENT, number = SINGULAR, person = 1),
         'VBZ' : conjugate(verb = word, tens = PRESENT, number = SG),
         'NN' : word,
         'NNP' : pluralize(word),
@@ -116,7 +134,6 @@ def isActivePattern(string, sentence):
         predicate = '('+pres_cont_predicate+'|'+pas_cont_predicate+'|'+pas_smpl_predicate+'|'+pres_predicate+'){1}'
         active_pat = re.compile('((PDT-|DT-|JJ-){1})?'+subject+'((CC-){1}'+subject+'{1})?'+
                              actionDescriptor+'?'+predicate+determiner+'?'+subject+'?')
-        print(string)
         is_active = active_pat.match(string)
         return is_active != None
     else:
@@ -128,11 +145,10 @@ def isActivePattern(string, sentence):
 def prepare():
     path = os.path.join(os.getcwd(),'vsbotintents', 'intents', '*.json')
     files = glob.glob(path)
-    data = readIntents(files[3])
+    data = readIntents(files[1])
+    sentences = []
 
     if data != None :
-        # kell tokenizalni meg mondatonkent is es itt vegig menni a mondatokon kulon kulon
-        #ez eddig egy mondatra megy
         for d in data:
             sentence = []
             pattern = ""
@@ -144,7 +160,8 @@ def prepare():
                 word_before, tag_before = d[index]
                 sentence.append((word, tag, synonyms, antonyms))
                 pattern += tag+'-'
-    return sentence, pattern
+            sentences.append((sentence, pattern))
+    return sentences
 
 def create_passive(sentence, pattern):
     pred_was_found = False
@@ -159,8 +176,7 @@ def create_passive(sentence, pattern):
             obj += w + " "
         else: 
             subj += w + " "
-    print('S: ',subj,' P: ',pred,' O: ',obj)
-    print(check_pass_tense_trans(subj, pred, obj, pattern))
+    return check_pass_tense_trans(subj, pred, obj, pattern)
 
 def get_person(subj):
     pos_subj = pos_tag([s for s in word_tokenize(subj)])
@@ -191,7 +207,7 @@ def check_pass_tense_trans(subj, pred, obj, pattern):
     number, person, _ = get_person(obj)
 
     if re.search(pres_cont_predicate, pattern) or re.search(pres_perfect_predicate, pattern) or re.search(pas_cont_predicate, pattern):
-        
+
         word_to_use,pred = wnl.lemmatize(word=pred.split(' ',1)[0].strip(), pos=wnTag('V')) ,pred.split(' ', 1)[1]
 
         if re.search(pas_cont_predicate, pattern):
@@ -210,15 +226,37 @@ def check_pass_tense_trans(subj, pred, obj, pattern):
             pred = start+ " " + conjugate(wnl.lemmatize(word=pred.strip(), pos=wnTag('V')), PAST, aspect = PROGRESSIVE)
             return obj + " " + pred + " by "+s
 
+def random_new_sentence(sentence):
+    paraphrases = []
+    for _ in range(1,10):
+        paraphrase = ""
+        for (word, tag, syns, _) in sentence:
+            if len(syns) > 4:
+                next_word = syns[random.randint(0,4)]
+            else:
+                if len(syns) > 0:
+                    next_word = syns[random.randint(0,len(syns) - 1)]
+                else:
+                  next_word = word  
+            if tag.startswith('V'):
+                next_word = getRightForm(next_word, tag)
+            paraphrase = paraphrase + next_word + " "
+        paraphrases.append(paraphrase)
+    paraphrases = set(paraphrases)
+    print(paraphrases)
+    
 
-                
 def paraphrase():
-    sentence, pattern = prepare()
-    if (isActivePattern(pattern, sentence)):
-        print('Active')
-        return create_passive(sentence, pattern)
-    else:
-        print('Not active')
-        return sentence 
+    sentences = prepare()
+    for (sentence, pattern) in sentences:
+        if (isActivePattern(pattern, sentence)):
+            # print('Active')
+            # print(sentence)
+            random_new_sentence(sentence)
+            # print(create_passive(sentence, pattern))
+        else:
+            # print('Not active')
+            # print(sentence) 
+            random_new_sentence(sentence)
 
 paraphrase()
