@@ -8,3 +8,4 @@ db.sqlite3
 /static/
 /staticfiles/sentimentAnalysis
 /dialogflowbot/vsbotintents/
+/dialogflowbot/seq2seq/data/
