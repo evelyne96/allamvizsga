@@ -328,11 +328,12 @@ def get_dataset(n_in, n_out, cardinality, n_samples):
     y =  data_work.encode_output(array(y), cardinality)
     return array(X1), array(X2), array(y)
 
+#DEBUGGING
 
-stop_id = 101
-start_id = 0
+#stop_id = 101
+#start_id = 0
 # 3+1 tehat 3 hosszu eredmeny
-train_source,train_target, target_to_decode = get_dataset(8, 3, 102, 10000)
+#train_source,train_target, target_to_decode = get_dataset(8, 3, 102, 10000)
 
 # model, encoder_model, decoder_model = define_model(102, 102, 256, True)
 # model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
@@ -340,9 +341,9 @@ train_source,train_target, target_to_decode = get_dataset(8, 3, 102, 10000)
 # 88,77,66,55,44, 33, 22, 11
 # train_model(model,encoder_model, decoder_model, train_source, train_target, target_to_decode, True)
 
-model, encoder_model, decoder_model = load_models_from_files()
+#model, encoder_model, decoder_model = load_models_from_files()
 
-test = [[88,77,66,55,44, 33, 22, 11]]
-decoded, asd = beam_search(array(test), encoder_model, decoder_model, vocab_size, max_target_length)
+#test = [[88,77,66,55,44, 33, 22, 11]]
+#decoded, asd = beam_search(array(test), encoder_model, decoder_model, vocab_size, max_target_length)
 
 # decode_sequence2(test, encoder_model, decoder_model, 102, 3)
