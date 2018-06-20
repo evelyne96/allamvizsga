@@ -32,6 +32,7 @@ def readIntents(fileToReadFrom):
                 for t in d['data']:
                     text = t['text']
                     #elso sorban mondatokra kene bontani es azt szavakra es abbol csinalni egy listat
+                    print(text)
                     tokens = [t for t in word_tokenize(text)]
                     tokens = pos_tag(tokens)
                     usersays.append(tokens)
@@ -39,6 +40,13 @@ def readIntents(fileToReadFrom):
     except Exception as e:
         print('Exception when reading: '+testfile+" "+str(e))
         return None
+
+def writePhrases(fileName, sets_of_pharases):
+    with open(fileName, 'w') as the_file:
+        for phrases in sets_of_pharases:
+            for p in phrases:
+                the_file.write("%s\n" % p)
+        the_file.close()
 
 def wnTag(tag):
     if tag.startswith('JJ'):
@@ -145,7 +153,8 @@ def isActivePattern(string, sentence):
 def prepare():
     path = os.path.join(os.getcwd(),'vsbotintents', 'intents', '*.json')
     files = glob.glob(path)
-    data = readIntents(files[1])
+    # data = readIntents(files[5])
+    data = readIntents2()
     sentences = []
 
     if data != None :
@@ -207,9 +216,7 @@ def check_pass_tense_trans(subj, pred, obj, pattern):
     number, person, _ = get_person(obj)
 
     if re.search(pres_cont_predicate, pattern) or re.search(pres_perfect_predicate, pattern) or re.search(pas_cont_predicate, pattern):
-
         word_to_use,pred = wnl.lemmatize(word=pred.split(' ',1)[0].strip(), pos=wnTag('V')) ,pred.split(' ', 1)[1]
-
         if re.search(pas_cont_predicate, pattern):
             start = conjugate(word_to_use, PAST, person, number)
         else:
@@ -244,19 +251,37 @@ def random_new_sentence(sentence):
         paraphrases.append(paraphrase)
     paraphrases = set(paraphrases)
     print(paraphrases)
+    return paraphrases
     
 
 def paraphrase():
     sentences = prepare()
+    p = []
     for (sentence, pattern) in sentences:
-        if (isActivePattern(pattern, sentence)):
+        paraphrases = random_new_sentence(sentence)
+        p.append(paraphrases)
+        # if (isActivePattern(pattern, sentence)):
             # print('Active')
             # print(sentence)
-            random_new_sentence(sentence)
+            # paraphrases = random_new_sentence(sentence)
             # print(create_passive(sentence, pattern))
-        else:
+        # else:
             # print('Not active')
             # print(sentence) 
-            random_new_sentence(sentence)
+            # random_new_sentence(sentence)
+    writePhrases("generated_phrases/see-ghost-more-passage.txt", p)
 
+def readIntents2():
+    data = []
+    usersays = []    
+    data = ["Discover what is in the passageway", "Go into the hole that opened up for you", "Discover the open passageway",
+             "Follow the passageway to find_out what is inside it", "I want you to find_out what is in the passageway"]
+    for tt in data:
+         text = tt
+         #elso sorban mondatokra kene bontani es azt szavakra es abbol csinalni egy listat
+         print(text)
+         tokens = [t for t in word_tokenize(text)]
+         tokens = pos_tag(tokens)
+         usersays.append(tokens)
+    return usersays
 paraphrase()

@@ -11,6 +11,14 @@ from random import randint
 from numpy import array
 
 source_ids, target_ids, vectorizer = data_work.read_preprocessed_data()
+
+#reverse source
+l = []
+for s in source_ids:
+    s = s[::-1]
+    l.append(s)
+source_ids = l
+
 #id_to_word
 inverse_vocabulary = {}
 for (k,v) in enumerate(vectorizer.vocabulary_):
@@ -45,7 +53,7 @@ target_to_decode = data_work.encode_output(target_to_decode, vocab_size)
 
 def define_model(src_vocab_size, trg_vocab_size, n_unit, bi_directional, dropout = 0.2):
     encoder_inputs = Input(shape=(None,))
-    emb_inp = Embedding(src_vocab_size, n_unit, mask_zero=True)(encoder_inputs)
+    emb_inp = Embedding(src_vocab_size, n_unit)(encoder_inputs)
 
     if bi_directional:
         encoder_lstm = Bidirectional(LSTM(n_unit, return_state=True,dropout = dropout))
@@ -83,11 +91,13 @@ def define_model(src_vocab_size, trg_vocab_size, n_unit, bi_directional, dropout
     decoder_outputs2 = decoder_dense(decoder_outputs2)
     decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs2] + decoder_states2)
 
+    print(decoder_model.summary())
+
     # return all models
     return model, encoder_model, decoder_model
 
 
-def train_model(model, m2 ,m3 , train_in, train_out, target_to_decode):
+def train_model(model, m2 ,m3 , train_in, train_out, target_to_decode, test = False):
     # filename = 'train_model.h5'
     # checkpoint = ModelCheckpoint(filename, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     # model.fit([train_in, train_out], target_to_decode, epochs=30, batch_size=256, validation_split=0.1,\
@@ -100,8 +110,12 @@ def train_model(model, m2 ,m3 , train_in, train_out, target_to_decode):
         if n % 10 == 0:
             save_models_to_file(model, m2, m3)
             # to comply with the recommendations
-            test = 'to implement the recommendations'
-            decode_sequence(test, m2, m3, vocab_size, max_target_length)
+            if test:
+                test_sample = [[88,77,66,55,44, 33, 22, 11]]
+                decode_sequence2(test_sample, m2, m3)
+            else:    
+                test_sample = 'to implement the recommendations'
+                decode_sequence(test_sample, m2, m3, vocab_size, max_target_length)
 
 def decode_sequence(input_seq, encoder_model, decoder_model, num_decoder_tokens, max_len):
     # Encode the input as state vectors.
@@ -140,8 +154,78 @@ def decode_sequence(input_seq, encoder_model, decoder_model, num_decoder_tokens,
         # Update states
         states_value = [h, c]
 
-    print(decoded_sentence)
+    # print(decoded_sentence)
     return decoded_sentence
+
+def beam_search(input_seq, encoder_model, decoder_model, num_decoder_tokens, max_len, k=2, maxsample = 40):
+    # s = list()
+    # s.append(data_work.get_ids_for_sentence(data_work.word_tokenize(input_seq), vectorizer.vocabulary_)[:30])
+    # input_seq = data_work.pad_sentences(s, pad_id, max_source_length)
+    states_value = encoder_model.predict(input_seq)
+
+    dead_k = 0 # samples that reached eos
+    dead_samples = []
+    dead_scores = []
+    live_k = 1 # samples that did not yet reached eos
+    live_samples = numpy.zeros((1,1))
+    live_samples[0,0] = start_id
+    live_scores = [0]
+
+    while live_k and dead_k < k:
+        # for every possible live sample calc prob for every possible label 
+        probs, h, c = decoder_model.predict([live_samples] + states_value)
+
+        # total score for every sample is sum of -log of word prb
+        cond_scores = numpy.array(live_scores)[:,None] - numpy.log(probs)
+        cond_flat = cond_scores.flatten()
+        # find the best (lowest) scores we have from all possible samples and new words
+        ranks_flat = cond_flat.argsort()[:(k-dead_k)]
+        live_scores = cond_flat[ranks_flat]
+
+        # append the new words to their appropriate live sample
+        voc_size = probs.shape[2]
+        live_samples = [live_samples[r//voc_size]+[r%voc_size] for r in ranks_flat]
+        print(live_samples)
+
+        # live samples that should be dead are...
+        zombie = [s[-1] == stop_id or len(s) >= maxsample for s in live_samples]
+
+        # add zombies to the dead
+        dead_samples += [s for s,z in zip(live_samples,zombie) if z]  # remove first label == empty
+        dead_scores += [s for s,z in zip(live_scores,zombie) if z]
+        dead_k = len(dead_samples)
+        # remove zombies from the living 
+        live_samples = array([s for s,z in zip(live_samples,zombie) if not z])
+        live_scores = [s for s,z in zip(live_scores,zombie) if not z]
+        live_k = len(live_samples)
+
+        states_value = [h, c]
+
+    return dead_samples + live_samples, dead_scores + live_scores   
+
+
+def beam_search_decoder(encoder_model, decoder_model, k):
+	sequences = [[list([start_id]), 1.0]]
+    states_value = encoder_model.predict(input_seq)
+
+    data, h, c = decoder_model.predict([live_samples] + states_value)
+
+    # walk over each step in sequence
+	for row in data:
+		all_candidates = list()
+		# expand each current candidate
+		for i in range(len(sequences)):
+			seq, score = sequences[i]
+			for j in range(len(row)):
+				candidate = [seq + [j], score * -log(row[j])]
+				all_candidates.append(candidate)
+		# order all candidates by score
+		ordered = sorted(all_candidates, key=lambda tup:tup[1])
+		# select k best
+		sequences = ordered[:k]
+	return sequences
+
+
 
 def save_models_to_file(m1, m2, m3):
     m1.save('models/train_model.h5')
@@ -158,15 +242,21 @@ def load_models_from_files():
     return train_m, encoder_model, decoder_model
 
 
-model, encoder_model, decoder_model = define_model(vocab_size, vocab_size, 256, True)
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
-print(model.summary())
-train_model(model,encoder_model, decoder_model, train_source, train_target, target_to_decode)
+
+# model, encoder_model, decoder_model = define_model(vocab_size, vocab_size, 256, True)
+
+# model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
+# print(model.summary())
+# train_model(model,encoder_model, decoder_model, train_source, train_target, target_to_decode)
 
 # model, encoder_model, decoder_model = load_models_from_files()
-# test = 'proposed by the president of the'
-# decode_sequence(test, encoder_model, decoder_model, vocab_size, max_target_length)
+
+# tests = ['proposed by the president of the', 'of the main objectives of', 'one of the most critical factors', 'were in favour of']
+
+# for test in tests:
+    # decoded = decode_sequence(test, encoder_model, decoder_model, vocab_size, max_target_length)
+    # print('from: ', test, 'to: ', decoded)
 
 
 
@@ -180,13 +270,14 @@ train_model(model,encoder_model, decoder_model, train_source, train_target, targ
 
 
 #for debugging purposes
-def decode_sequence2(input_seq, encoder_model, decoder_model, num_decoder_tokens, max_len):
+def decode_sequence2(input_seq, encoder_model, decoder_model, num_decoder_tokens=102, max_len=3):
     # Encode the input as state vectors.
     x = array(input_seq)
     states_value = encoder_model.predict(x)
 
     target_seq = numpy.zeros((1,1))
     # Populate the first character of target sequence with the start character.
+    
     target_seq[0,0] = start_id
     # Sampling loop for a batch of sequences
     # (to simplify, here we assume a batch of size 1).
@@ -204,7 +295,6 @@ def decode_sequence2(input_seq, encoder_model, decoder_model, num_decoder_tokens
             stop_condition = True
 
         # Update the target sequence (of length 1).
-        target_seq = numpy.zeros((1,1))
         target_seq[0, 0] = sampled_token_index
 
         # Update states
@@ -239,16 +329,20 @@ def get_dataset(n_in, n_out, cardinality, n_samples):
     return array(X1), array(X2), array(y)
 
 
-# stop_id = 101
-# start_id = 0
+stop_id = 101
+start_id = 0
 # 3+1 tehat 3 hosszu eredmeny
-# train_source,train_target, target_to_decode = get_dataset(8, 3, 102, 10000)
+train_source,train_target, target_to_decode = get_dataset(8, 3, 102, 10000)
+
 # model, encoder_model, decoder_model = define_model(102, 102, 256, True)
 # model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
-# # print(model.summary())
-# train_model(model,encoder_model, decoder_model, train_source, train_target, target_to_decode)
+# print(model.summary())
+# 88,77,66,55,44, 33, 22, 11
+# train_model(model,encoder_model, decoder_model, train_source, train_target, target_to_decode, True)
 
-# model, encoder_model, decoder_model = load_models_from_files()
+model, encoder_model, decoder_model = load_models_from_files()
 
-# test = [[88,77,66,55,44, 33, 22, 11]]
+test = [[88,77,66,55,44, 33, 22, 11]]
+decoded, asd = beam_search(array(test), encoder_model, decoder_model, vocab_size, max_target_length)
+
 # decode_sequence2(test, encoder_model, decoder_model, 102, 3)

@@ -9,11 +9,44 @@
     </div>
 
     <div class="settings-form">
-        <ul class='circle-container'> 
-            {% for gamer in gamers %}
-            <li> <img src= '/static/{{ gamer.image }}' > </li>
-            {% endfor %}
+        <div class="logbox2">
+        <ul class="tab-group">
+                    <li class="tab active"><a href="#companion">Companion</a></li>
+                    <li class="tab"><a href="#usercharacter">User Character</a></li>
         </ul>
+
+        <div class='flex-grid' id = 'companion'>
+            {% for gamer in gamers %}
+                {% if  userSettings.companion_character.id == gamer.id %}
+                        <input type="radio" name="companion" id='{{gamer.name}}radio{{gamer.id}}' 
+                                 class="input-hidden companionCheck" value="{{gamer.id}}" checked="checked"/>
+                {% else %}
+                        <input type="radio" name="companion" id='{{gamer.name}}radio{{gamer.id}}' 
+                        class="input-hidden companionCheck" value="{{gamer.id}}" />
+                {% endif %}
+            <label for='{{gamer.name}}radio{{gamer.id}}' class="col">
+                <img src='/static/{{gamer.image}}' alt={{gamer.name}}/>
+            </label>
+            {% endfor %}
+        </div>
+
+        <div class='flex-grid' id = 'usercharacter'> 
+                {% for gamer in userCharacters %} 
+                    {% if  userSettings.user_character.id == gamer.id %}
+                        <input type="radio" name="usercharacter" id='{{gamer.name}}radio{{gamer.id}}' 
+                                 class="input-hidden usercharacterCheck" value="{{gamer.id}}" checked="checked"/>
+                    {% else %}
+                        <input type="radio" name="usercharacter" id='{{gamer.name}}radio{{gamer.id}}' 
+                        class="input-hidden usercharacterCheck" value="{{gamer.id}}" />
+                    {% endif %}
+                    <label for='{{gamer.name}}radio{{gamer.id}}' class="col">
+                        <img src='/static/{{gamer.image}}' alt={{gamer.name}}/>
+                    </label>
+                {% endfor %}
+            </div>
+
+            <input type="submit"  class="submitSignUp" value="Submit" onclick="submitSettings()">
+        </div>
     </div>
 </div>
 {% endblock %}

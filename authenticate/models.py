@@ -24,8 +24,8 @@ class UserCharacter(models.Model):
 class UserSettings(models.Model):
     """UserSetting model"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    user_character = models.OneToOneField(UserCharacter, on_delete=models.DO_NOTHING, default=1)
-    companion_character = models.OneToOneField(BotCharacter,  on_delete=models.DO_NOTHING, default=1)
+    user_character = models.ForeignKey(UserCharacter, on_delete=models.DO_NOTHING, default=1)
+    companion_character = models.ForeignKey(BotCharacter,  on_delete=models.DO_NOTHING, default=1)
     mood = models.IntegerField(default=0)
     story_type = models.CharField(max_length=254)
 

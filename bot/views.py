@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from myapp import settings
 from authenticate.models import Profile, UserCharacter, UserSettings
+from .models import BotCharacter
 
 @login_required(login_url='/login/')
 def index(request):
@@ -28,7 +29,8 @@ def index(request):
         'message': text,
         'character' : us.companion_character,
         'gamer' : us.user_character,
-        'mood' : us.mood
+        'mood' : us.mood,
+        'companion_gender' : BotCharacter.objects.filter(id = us.companion_character.id)[0].gender
     }
   
     return render(request, 'content.html', context)
@@ -36,7 +38,6 @@ def index(request):
 @login_required(login_url='/login/')
 def post_message(request):
     """Post new message"""
-    import json
     data = json.loads(request.body); sent_text = data['sent_text']
     my_ai = ai_controller.AiController()
     current_profile = UserSettings.objects.filter(user_id = request.user.id)[0]
@@ -48,18 +49,32 @@ def post_message(request):
         current_profile.update_mood(prediction)
     else:
          answer = my_ai.get_text_from_response(my_ai.send_text_message(request.session.session_key, 'Hi'))
-
     data = { 'answer' : answer, 'mood' : current_profile.mood}
     return HttpResponse(json.dumps(data), content_type="application/json")
 
+@login_required(login_url='/login/')
 def settings(request):
     current_profile = Profile.objects.filter(user_id = request.user.id)[0]
     current_settings = UserSettings.objects.filter(user_id = request.user.id)[0]
-    fgamers = model.BotCharacter.objects.filter(gender='female')
-    print(fgamers)
-    current_character = model.UserCharacter.objects.filter(user_id = request.user.id)[0]
-    context = { 'gamers' : fgamers,
+    gamers = model.BotCharacter.objects.all()
+    usercharacters = UserCharacter.objects.all()
+    current_character = UserCharacter.objects.filter(id = current_settings.user_character.id)[0]
+    print(current_character.image)
+    context = { 'gamers' : gamers,
                 'username' : current_profile.first_name,
-                'userCharacter' : current_character.name
+                'userCharacter' : current_character,
+                'userCharacters' : usercharacters,
+                'userSettings' : current_settings
               }
     return render(request, 'settings.html', context)
+
+@login_required(login_url='/login/')
+def post_settings(request):
+    if request.method == 'POST':
+            user = request.user
+            us = UserSettings.objects.filter(user_id = request.user.id)[0]
+            data = json.loads(request.body)
+            us.companion_character = BotCharacter.objects.filter(id = data['companion'])[0]
+            us.user_character = UserCharacter.objects.filter(id = data['usercharacter'])[0]
+            us.save()
+    return HttpResponse(json.dumps({"message":"Success"}) ,content_type="application/json")
