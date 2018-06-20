@@ -9,3 +9,4 @@ db.sqlite3
 /staticfiles/sentimentAnalysis
 /dialogflowbot/vsbotintents/
 /dialogflowbot/seq2seq/data/
+/dialogflowbot/generated_phrases/
